@@ -1,3 +1,10 @@
+TM1629/.pio
+TM1629/.vscode/.browse.c_cpp.db*
+TM1629/.vscode/c_cpp_properties.json
+TM1629/.vscode/launch.json
+TM1629/.vscode/ipch
+
+
 # Prerequisites
 *.d
 
