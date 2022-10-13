@@ -1,0 +1,27 @@
+{
+  "folders": [
+	{
+		"path": ".."
+	},
+	{
+		"name": "TM1629",
+		"path": "."
+	}
+],
+  "settings": {
+    "files.associations": {
+      "functional": "c",
+      "optional": "c",
+      "system_error": "c",
+      "xlocmon": "c",
+      "xtr1common": "c",
+      "istream": "c",
+      "ostream": "c",
+      "ratio": "c",
+      "array": "c",
+      "tuple": "c",
+      "type_traits": "c",
+      "utility": "c"
+    }
+  }
+}
