@@ -134,8 +134,8 @@ void app_main()
     while (1)
     {
        UpdateDisplay();
-     vTaskDelay(50 / portTICK_PERIOD_MS);
-    // printf("Tick\n");
+     vTaskDelay(500 / portTICK_PERIOD_MS);
+    printf("Tick\n");
     // gpio_set_level(TM162_Data, 0);
     // vTaskDelay(500 / portTICK_PERIOD_MS);
     // gpio_set_level(TM162_Data, 1);
