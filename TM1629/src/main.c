@@ -18,6 +18,7 @@ GPIO14  STROB
 #include "driver/spi_master.h"
 #include "sdkconfig.h"
 #include "driver/uart.h"
+#include "TM1637Display.h"
 
 
 #define ACTIVATE 0x8f
@@ -44,96 +45,64 @@ void GPIOInit()
     gpio_pad_select_gpio(TM162_STROBE);
     gpio_set_direction(TM162_STROBE, GPIO_MODE_OUTPUT);
 }
-void SendDataMSB(uint8_t data)
-{
-int i;
-  gpio_set_level(TM162_STROBE, 0);
-   vTaskDelay(1 / portTICK_PERIOD_MS);
-    for(i=0;i<8;i++)
-    {
-    vTaskDelay(1 / portTICK_PERIOD_MS); 
-    gpio_set_level(TM162_Data, data&0x80);
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-    gpio_set_level(TM162_CLK, 0);
-    vTaskDelay(5 / portTICK_PERIOD_MS);
-    gpio_set_level(TM162_CLK, 1);
-    data<<=1;
-    }
-     vTaskDelay(1 / portTICK_PERIOD_MS);
-  gpio_set_level(TM162_STROBE, 1);
-
-}
-void SendData(uint8_t data)
-{
-int i;
-  gpio_set_level(TM162_STROBE, 0);
-   vTaskDelay(1 / portTICK_PERIOD_MS);
-    for(i=0;i<8;i++)
-    {
-    vTaskDelay(1 / portTICK_PERIOD_MS); 
-    gpio_set_level(TM162_Data, data&0x1);
-    vTaskDelay(1 / portTICK_PERIOD_MS);
-    gpio_set_level(TM162_CLK, 0);
-    vTaskDelay(5 / portTICK_PERIOD_MS);
-    gpio_set_level(TM162_CLK, 1);
-    data>>=1;
-    }
-     vTaskDelay(1 / portTICK_PERIOD_MS);
-  gpio_set_level(TM162_STROBE, 1);
-
-}
-
-
-void TM1629Reset() 
-{
-  SendData(WRITE_INC); // set auto increment mode
-  gpio_set_level(TM162_STROBE, 0);
-  SendData(0xc0);   // set starting address to 0
-  for (uint8_t i = 0; i < 16; i++)
-  {
-    SendData( 0x00);
-  }
-  gpio_set_level(TM162_STROBE, 1);
-  SendData(WRITE_INC); // set auto increment mode
-  SendData(ACTIVATE);
-}
 //======================================================================================================
 
-void TM1629Init()
+void delayMicroseconds(uint32_t delay)
 {
-    gpio_set_level(TM162_STROBE, 1);
-    gpio_set_level(TM162_CLK, 1);
-    gpio_set_level(TM162_Data, 1);
-    SendData(ACTIVATE);
-    TM1629Reset();
+ esp_rom_delay_us(delay);
 }
-void UpdateDisplay()
+void SetClockPinDir(uint8_t dir)
 {
-  
-
-  SendData(WRITE_INC);
-  gpio_set_level(TM162_STROBE, 0);
-  SendData(0xc0);   // set starting address to 0
-  for (uint8_t i = 0; i < 8; i++)
-  {
-    uint8_t tempData = 0x00;  //SEG1-8
-    for (uint8_t j=0; j<8; j++){
-      tempData |=( 0x0a/*by amin*/ & (0x80 >> i)) << i >> j;
-    }
-  }
-  gpio_set_level(TM162_STROBE, 1);
-
+  if (dir == 0)
+   
+    gpio_set_direction(TM162_CLK, GPIO_MODE_INPUT);
+  else
+    gpio_set_direction(TM162_CLK, GPIO_MODE_OUTPUT);
+}
+void SetDataPinDir(uint8_t dir)
+{
+  if (dir == 0)
+   // pinMode(DIO, INPUT);
+    gpio_set_direction(TM162_Data, GPIO_MODE_INPUT);
+  else
+    //pinMode(DIO, OUTPUT);
+    gpio_set_direction(TM162_Data, GPIO_MODE_OUTPUT);
+}
+void SetClockValue(uint8_t value)
+{
+  if (value == 0)
+    // digitalWrite(CLK, LOW);
+    gpio_set_level(TM162_CLK, 0);
+  else
+    // digitalWrite(CLK, HIGH);
+    gpio_set_level(TM162_CLK, 1);
+}
+void SetDataValue(uint8_t value)
+{
+  if (value == 0)
+    // digitalWrite(DIO, LOW);
+    gpio_set_level(TM162_Data, 0);
+  else
+    // digitalWrite(DIO, HIGH);
+    gpio_set_level(TM162_Data, 1);
+}
+int ReadDataPinValue()
+{
+  // return digitalRead(DIO);
+  return gpio_get_level(TM162_Data);
 }
 //======================================================================================================
 void app_main() 
 {
 
     GPIOInit();
-    TM1629Init();
-
+    // TM1629Init();
+  TM1637Display(SetClockPinDir, SetClockValue,
+                SetDataPinDir, SetDataValue,
+                ReadDataPinValue, delayMicroseconds);
     while (1)
     {
-       UpdateDisplay();
+  
      vTaskDelay(500 / portTICK_PERIOD_MS);
     printf("Tick\n");
     // gpio_set_level(TM162_Data, 0);

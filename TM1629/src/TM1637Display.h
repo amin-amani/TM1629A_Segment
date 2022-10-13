@@ -32,8 +32,13 @@
 //!
 //! @param pinClk - The number of the digital pin connected to the clock pin of the module
 //! @param pinDIO - The number of the digital pin connected to the DIO pin of the module
-void TM1637Display(uint8_t pinClk, uint8_t pinDIO);
 
+void TM1637Display(void (*SetClockDirCallback)(uint8_t),
+                   void (*SetClockCallback)(uint8_t),
+                   void (*SetDataDirCallback)(uint8_t),
+                   void (*SetDataCallback)(uint8_t),
+                   int (*ReadDataCallback)(void),
+                   void (*DelayCallback)(uint32_t));
 //! Sets the brightness of the display.
 //!
 //! The setting takes effect when a command is given to change the data being
@@ -54,7 +59,7 @@ void setBrightness(uint8_t brightness);
 //! @param segments An array of size @ref length containing the raw segment values
 //! @param length The number of digits to be modified
 //! @param pos The position from which to start the modification (0 - leftmost, 3 - rightmost)
-void setSegments(const uint8_t segments[], uint8_t length = 4, uint8_t pos = 0);
+void setSegments(const uint8_t segments[], uint8_t length , uint8_t pos );
 
 //! Displayes a decimal number
 //!
@@ -67,8 +72,7 @@ void setSegments(const uint8_t segments[], uint8_t length = 4, uint8_t pos = 0);
 //!        fits to the number of digits requested (for example, if two digits are to be displayed,
 //!        the number must be between 0 to 99)
 //! @param pos The position least significant digit (0 - leftmost, 3 - rightmost)
-void showNumberDec(int num, bool leading_zero = false, uint8_t length = 4, uint8_t pos = 0);
-
+void showNumberDec(int num, bool leading_zero, uint8_t length, uint8_t pos);
 //! Translate a single digit into 7 segment code
 //!
 //! The method accepts a number between 0 - 15 and converts it to the
